@@ -140,8 +140,17 @@ with st.expander('See validation, input factors and limitations',expanded=True):
     fig2.update_xaxes(gridcolor='#ead5e0',tickfont=dict(color='#542b46',size=12))
     fig2.update_yaxes(tickfont=dict(color='#542b46',size=13))
     st.plotly_chart(fig2,use_container_width=True)
-    st.warning('Model is trained and tested only on simulated outputs of the same engineering method; the score is NOT evidence of predictive performance on observed sites. A direct equation remains preferable where applicable. Soil-group numeric encoding is a simplification. Real observations and independent hydraulic modeling are needed for an operational AI model.')
-
+   
+    st.markdown(
+        '<div class="note"><strong>AI Model Limitations</strong><p>'
+        'This model was trained and tested using simulated engineering data, '
+        'not real-world stormwater measurements. Its accuracy on actual sites '
+        'has not been established. The direct engineering equation remains '
+        'our reference calculation. Soil-group encoding is simplified, and '
+        'real-world validation is needed before design use.'
+        '</p></div>',
+        unsafe_allow_html=True
+    )
 st.markdown('<div class="numeral" style="margin-top:24px">04 / THE ENGINEERING DECISION</div>',unsafe_allow_html=True)
 st.subheader('What should an engineer do next?')
 st.markdown('''**RainCheck supports an early go/no-go conversation:**
