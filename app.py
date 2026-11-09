@@ -1,4 +1,4 @@
-"""RainCheck AI v0.3: preliminary sustainable site design, not final drainage design."""
+"""RainCheck AI v0.4: preliminary sustainable site design, not final drainage design."""
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
@@ -27,8 +27,32 @@ h1,h2,h3{color:#84214f!important;letter-spacing:-.025em}
 .numeral{font-size:.83rem;color:#bd3274;font-weight:800;letter-spacing:.09em}
 [data-testid="stDataFrame"]{border-radius:12px;overflow:hidden}
 [data-testid="stExpander"]{background:#fff;border:1px solid #f1c3d6;border-radius:14px}
+
+/* Accessibility fixes for Streamlit controls and notices */
+[data-testid="stSidebar"] [data-baseweb="select"] > div,
+[data-testid="stSidebar"] [data-baseweb="input"] > div,
+[data-testid="stSidebar"] input {
+  background-color:#ffffff!important;color:#352039!important;border:1px solid #bd618c!important;
+}
+[data-testid="stSidebar"] [data-baseweb="select"] span,
+[data-testid="stSidebar"] [data-baseweb="select"] div,
+[data-testid="stSidebar"] [data-baseweb="select"] svg,
+[data-testid="stSidebar"] [data-baseweb="input"] input {color:#352039!important;fill:#8b2358!important;opacity:1!important}
+[role="listbox"], [role="option"] {background:#fff8fb!important;color:#352039!important}
+[role="option"] * {color:#352039!important}
+[data-testid="stAlert"] {background:#fff0f6!important;border:1px solid #d85796!important;border-left:5px solid #bb246e!important;border-radius:14px!important}
+[data-testid="stAlert"] *,[data-testid="stAlert"] p {color:#4f2042!important;opacity:1!important}
+[data-testid="stMetricValue"] {overflow:visible!important}
+[data-testid="stMetricValue"]>div {font-size:clamp(1.15rem,2vw,1.8rem)!important;overflow-wrap:anywhere!important;white-space:normal!important}
+[data-testid="stMetricLabel"] * {color:#623048!important;font-weight:650!important}
+.stApp [data-testid="stCaptionContainer"] * {color:#654456!important}
+/* Visually separate decision outputs from a model's estimates */
+.decision-card{background:#fff;border:2px solid #ed87b1;border-radius:20px;padding:20px;box-shadow:0 7px 22px rgba(167,25,88,.06)}
+.decision-label{font-size:.82rem;color:#7e3157!important;font-weight:800;letter-spacing:.04em}
+.decision-main{font-size:1.65rem;line-height:1.3;color:#762044!important;font-weight:800;overflow-wrap:break-word}
+.decision-sub{font-size:.92rem;color:#58354c!important;line-height:1.5}
 </style>''',unsafe_allow_html=True)
-st.markdown('<div class="pill">TIDETECH INNOVATORS · NSBE FRC 2026 · PINK & BERRY · V0.3</div>',unsafe_allow_html=True)
+st.markdown('<div class="pill">TIDETECH INNOVATORS · NSBE FRC 2026 · DESIGN STUDIO</div>',unsafe_allow_html=True)
 st.markdown('<div class="hero"><span class="hero-decoration">☁️ 💧 ✨</span><h1>🌧️ RainCheck AI</h1><p><b>Design smarter. Build greener.</b></p><small>The next-gen stormwater design studio. Explore your site, see what changes, and compare early-stage planning alternatives with transparent engineering checks.</small></div>',unsafe_allow_html=True)
 @st.cache_resource(show_spinner='Preparing the illustrative machine-learning model...')
 def get_ai(): return fit_model()
@@ -79,13 +103,13 @@ df['Feasible for screening']=df['Within budget'] & df['Within site constraint']
 feasible=df[(df['Feasible for screening']) & (df['Change (percentage points)']>0)]
 if len(feasible):
     best=feasible.sort_values(['Runoff reduction (ft³)','Illustrative cost ($)'],ascending=[False,True]).iloc[0]
-    c1,c2,c3=st.columns(3)
-    c1.metric('Recommended concept',f"{int(best['Change (percentage points)'])} pp less paving")
-    c2.metric('Runoff saved (modeled)',f"{best['Runoff reduction (ft³)']:,.0f} ft³",f"{best['Runoff reduction (%)']:.1f}% less")
-    c3.metric('Illustrative cost',f"${best['Illustrative cost ($)']:,.0f}")
+    st.markdown(f"""<div class="decision-card"><div class="decision-label">BEST ELIGIBLE CONCEPT · PRELIMINARY SCREENING</div>
+      <div class="decision-main">Reduce planned impervious area by {int(best['Change (percentage points)'])} percentage points</div>
+      <div class="decision-sub">Modeled event runoff reduced by <b>{best['Runoff reduction (ft³)']:,.0f} ft³ ({best['Runoff reduction (%)']:.1f}%)</b> · Illustrative cost: <b>${best['Illustrative cost ($)']:,.0f}</b></div>
+      </div>""",unsafe_allow_html=True)
     st.caption('Recommendation = largest directly calculated reduction among options that pass the entered budget and land-cover constraints; not an AI-generated final design.')
 else:
-    st.warning('No land-cover conversion option fits both the chosen budget and planning constraint. Retain the baseline and investigate other practices separately.')
+    st.markdown('''<div class="decision-card"><div class="decision-label">NO ELIGIBLE OPTION AT THIS BUDGET</div><div class="decision-main">Keep the baseline for now</div><div class="decision-sub">None of the screened paving-reduction options meets both your budget and land-cover constraint. Try a higher budget, a smaller change, or investigate other stormwater practices separately. This is not a failure of the drainage design.</div></div>''',unsafe_allow_html=True)
 
 plot=df.copy()
 plot['Category']=plot.apply(lambda r:'Feasible for screening' if r['Feasible for screening'] else 'Excluded by constraint',axis=1)
@@ -93,7 +117,9 @@ fig=go.Figure()
 for cat,col in [('Feasible for screening','#e72e83'),('Excluded by constraint','#b8a5b0')]:
     subset=plot[plot['Category']==cat]
     fig.add_trace(go.Bar(x=subset['Change (percentage points)'],y=subset['Runoff reduction (ft³)'],name=cat,marker_color=col,text=[f'{v:,.0f}' for v in subset['Runoff reduction (ft³)']],textposition='outside'))
-fig.update_layout(title='Modeled event runoff avoided by paved-area reduction',xaxis_title='Percentage points of site converted to pervious cover',yaxis_title='Runoff avoided (ft³)',barmode='overlay',plot_bgcolor='#fff',paper_bgcolor='#fff',font_color='#542b46',height=370,margin=dict(t=65,b=70,l=45,r=20),legend_orientation='h',legend_y=-.3)
+fig.update_layout(title='Modeled event runoff avoided by paved-area reduction',xaxis_title='Percentage points of site converted to pervious cover',yaxis_title='Runoff avoided (ft³)',barmode='overlay',plot_bgcolor='#fff',paper_bgcolor='#fff',font_color='#542b46',font_size=13,height=390,margin=dict(t=65,b=70,l=45,r=20),legend_orientation='h',legend_y=-.34)
+fig.update_xaxes(showgrid=False,tickfont=dict(color='#542b46',size=13),title_font=dict(color='#542b46',size=13))
+fig.update_yaxes(gridcolor='#ead5e0',tickfont=dict(color='#542b46',size=13),title_font=dict(color='#542b46',size=13))
 st.plotly_chart(fig,use_container_width=True)
 with st.expander('Scenario comparison table + feasibility flags'):
     st.dataframe(df[['Design scenario','Proposed impervious (%)','Area changed (acres)','Illustrative cost ($)','Runoff volume (ft³)','Runoff reduction (ft³)','Within budget','Within site constraint']],hide_index=True,use_container_width=True)
@@ -111,6 +137,8 @@ with st.expander('See validation, input factors and limitations',expanded=True):
     imp=pd.DataFrame({'Input':['Rainfall depth','Impervious cover','Soil group'],'Model importance':model.feature_importances_})
     fig2=go.Figure(go.Bar(x=imp['Model importance'],y=imp['Input'],orientation='h',marker_color='#e72e83'))
     fig2.update_layout(height=240,margin=dict(t=15,b=30,l=15,r=20),paper_bgcolor='#fff',plot_bgcolor='#fff',font_color='#542b46',yaxis={'autorange':'reversed'})
+    fig2.update_xaxes(gridcolor='#ead5e0',tickfont=dict(color='#542b46',size=12))
+    fig2.update_yaxes(tickfont=dict(color='#542b46',size=13))
     st.plotly_chart(fig2,use_container_width=True)
     st.warning('Model is trained and tested only on simulated outputs of the same engineering method; the score is NOT evidence of predictive performance on observed sites. A direct equation remains preferable where applicable. Soil-group numeric encoding is a simplification. Real observations and independent hydraulic modeling are needed for an operational AI model.')
 
@@ -124,4 +152,4 @@ st.markdown('''**RainCheck supports an early go/no-go conversation:**
 - **Escalate:** Complete hydrologic/hydraulic design in appropriate engineering tools before approvals, permitting or construction.
 ''')
 st.divider()
-st.caption('RainCheck AI v0.3 • Independent educational prototype for the 2026 NSBE FRC AI Impact-a-thon • Synthetic data and illustrative costs • Not professional design advice')
+st.caption('RainCheck AI • Prototype v0.4 • Independent educational prototype for the 2026 NSBE FRC AI Impact-a-thon • Synthetic data and illustrative costs • Not professional design advice')

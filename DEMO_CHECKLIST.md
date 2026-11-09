@@ -10,3 +10,10 @@
 8. Before judging: verify app works from a second browser/device and preload slides and a backup screenshot.
 9. Confirm five NSBE collegiate members rule with organizers and due-time 11:59 PM Eastern November 11.
 10. Replace bracketed app URL placeholder in slide 10; practice 10-minute presentation plus 5-minute Q&A.
+
+## Visual checks for v0.4
+- Soil group select shows chosen A/B/C/D in dark readable text on white.
+- Unit cost number input is legible.
+- Budget $20,000 shows a pink no-eligible-option notice; $25,000 selects the 5-percentage-point scenario.
+- Recommendation does not clip its title.
+- Bar chart labels and AI importance chart labels are legible on iPad.

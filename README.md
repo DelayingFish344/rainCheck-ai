@@ -1,4 +1,4 @@
-# RainCheck AI v0.2 — Sustainable Site Design Studio
+# RainCheck AI v0.4 — Sustainable Site Design Studio
 
 **TideTech Innovators | NSBE FRC 2026 | Educational prototype**
 
@@ -43,3 +43,14 @@ Set rainfall 3 in, site 5 acres, impervious 65%, soil B and budget $50,000. Show
 
 ## v0.3 theme
 Pink & berry UI update, new banner and explanatory visual, high contrast labels and chart accents. Engineering, model, and recommendation logic is unchanged from v0.2.
+
+## Development log — honest version history
+- **v0.1**: first engineering model, Streamlit site and synthetic AI surrogate.
+- **v0.2**: budget-constrained alternatives and stronger AI test reporting.
+- **v0.3**: brighter pink-and-berry visual identity.
+- **v0.4**: clearer dropdowns, warnings, readable plots and full-width recommendation card. No changes to core engineering or model mathematics.
+
+The app displays only the current product identity and small version number. Earlier versions remain documented in GitHub history.
+
+## Update an existing deployment
+Upload the eight project files directly to the root of the existing GitHub repository using GitHub's upload screen. Confirm any overwrite/replace prompts. Do not upload the ZIP as one file. A new commit should cause Streamlit Community Cloud to redeploy. If it doesn't, choose reboot/redeploy from your Streamlit app's management menu.
