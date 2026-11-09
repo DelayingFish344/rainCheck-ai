@@ -28,6 +28,17 @@ h1,h2,h3{color:#84214f!important;letter-spacing:-.025em}
 [data-testid="stDataFrame"]{border-radius:12px;overflow:hidden}
 [data-testid="stExpander"]{background:#fff;border:1px solid #f1c3d6;border-radius:14px}
 
+[data-testid="stExpander"] summary {
+    background-color: #FFF0F6 !important;
+    color: #542B46 !important;
+    border-radius: 12px !important;
+}
+
+[data-testid="stExpander"] summary * {
+    color: #542B46 !important;
+    opacity: 1 !important;
+}
+
 /* Accessibility fixes for Streamlit controls and notices */
 [data-testid="stSidebar"] [data-baseweb="select"] > div,
 [data-testid="stSidebar"] [data-baseweb="input"] > div,
@@ -120,7 +131,15 @@ for cat,col in [('Feasible for screening','#e72e83'),('Excluded by constraint','
 fig.update_layout(title='Modeled event runoff avoided by paved-area reduction',xaxis_title='Percentage points of site converted to pervious cover',yaxis_title='Runoff avoided (ft³)',barmode='overlay',plot_bgcolor='#fff',paper_bgcolor='#fff',font_color='#542b46',font_size=13,height=390,margin=dict(t=65,b=70,l=45,r=20),legend_orientation='h',legend_y=-.34)
 fig.update_xaxes(showgrid=False,tickfont=dict(color='#542b46',size=13),title_font=dict(color='#542b46',size=13))
 fig.update_yaxes(gridcolor='#ead5e0',tickfont=dict(color='#542b46',size=13),title_font=dict(color='#542b46',size=13))
-st.plotly_chart(fig,use_container_width=True)
+
+fig.update_layout(showlegend=False)
+st.plotly_chart(fig, use_container_width=True)
+
+st.markdown(
+    "🩷 **Pink:** Meets budget and site constraints"
+    " | "
+    "🩶 **Gray:** Excluded by constraints"
+)
 with st.expander('Scenario comparison table + feasibility flags'):
     st.dataframe(df[['Design scenario','Proposed impervious (%)','Area changed (acres)','Illustrative cost ($)','Runoff volume (ft³)','Runoff reduction (ft³)','Within budget','Within site constraint']],hide_index=True,use_container_width=True)
     st.caption('The site constraint is an engineer-entered simplification; it does not establish real ADA, parking, utility, grading, fire access, or local code feasibility.')
