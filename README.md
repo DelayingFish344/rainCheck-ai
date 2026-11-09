@@ -1,33 +1,45 @@
-# RainCheck AI — TideTech Innovators
+# RainCheck AI v0.2 — Sustainable Site Design Studio
 
-A functional prototype of an AI-assisted early-stage stormwater design explorer. **Not a final drainage design tool.**
+**TideTech Innovators | NSBE FRC 2026 | Educational prototype**
 
-## Run on Windows
+An interactive **preliminary stormwater site design** app that compares how changing planned impervious cover affects NRCS Curve Number event runoff. It adds a trained Random Forest surrogate, independent direct-equation checks, budget/footprint constraints, and explanatory decision notes. It **does not** predict actual campus flooding, compute pipe capacities, size stormwater controls, or replace licensed engineering design.
 
-1. Install Python 3.11+ from https://www.python.org/downloads/ (check "Add Python to PATH" if offered).
-2. Extract the ZIP. Open Windows Terminal or PowerShell in the `raincheck_ai` folder.
-3. Run `py -m pip install -r requirements.txt`.
-4. Run `py -m streamlit run app.py`.
-5. Open the localhost address shown (typically http://localhost:8501).
+## Run or deploy
 
-You can instead put these files in a GitHub repository and deploy with Streamlit Community Cloud at https://share.streamlit.io/. Main file: `app.py`. This requires a GitHub account and compatible dependency versions.
+For free Streamlit Community Cloud, upload **all the following files to your existing `raincheck-ai` GitHub repository root** (overwrite old files) and let the already deployed app update: `app.py`, `engineering.py`, `model.py`, `requirements.txt`, `README.md`, `test_engineering.py`, `test_model.py`. The main Streamlit file is **`app.py`**.
 
-## What is real vs illustrative?
+To run locally on Windows:
+```
+python -m pip install -r requirements.txt
+python -m streamlit run app.py
+```
 
-- **Engineering calculation:** NRCS Curve Number event runoff depth, Q=(P-0.2S)^2/(P+0.8S), for P>0.2S and S=1000/CN-10. CN is an assumed weighted composite of impervious (98) and pervious good-condition open space (A=39, B=61, C=74, D=80). This is a screening model, not a drainage design.
-- **AI:** A Random Forest trained on 2,600 synthetically generated inputs and formula-generated labels; evaluated on a held-out 20% test split. The ML approximates the engineering calculation. It does **not** demonstrate independent predictive skill against field observations or outperform the equation.
-- **Design alternatives:** Converting 5–30 percentage points of total site area from paving to landscaped pervious cover. This is a hypothetical pre-construction site-layout comparison; not a rain garden, detention, or permeable pavement performance model.
-- **Costs:** $90,000 per acre converted, purely illustrative, not a market/contractor estimate. Replace before real use.
-- **No flood claims:** This model does not predict ponding/flooding, peak discharge, time of concentration, drainage capacity, or code compliance.
+Tests:
+```
+python test_engineering.py
+python test_model.py
+```
 
-## Suggested judge demo
+## What it actually does
 
-1. Start with P=3 in, area=5 acres, HSG B, 65% impervious.
-2. Change impervious area from 65% to 85% and explain the change to runoff.
-3. Set a $50,000 budget. Show which land-cover conversions fit and explain the constraints.
-4. Show direct engineering calculation vs the Random Forest surrogate and the held-out error; make clear that synthetic validation is not real-world validation.
-5. Explain future work: field data, calibrated SWMM, life-cycle cost and site-layout constraints.
+1. Calculates composite runoff Curve Number assuming directly connected impervious cover CN=98, and pervious open space in good condition with CN by hydrologic group A=39, B=61, C=74, D=80.
+2. Applies NRCS runoff depth with initial abstraction `Ia=0.2S`, and converts depth to event runoff volume.
+3. Compares reducing proposed paving by 5–30 percentage points, constrained by available pavement, a **user-entered maximum conversion**, and an **illustrative** per-acre cost and budget.
+4. Recommends the **largest equation-calculated runoff reduction** among allowed conversion scenarios. This deterministic constraint-based choice is not misrepresented as AI.
+5. Trains a Random Forest on synthetic engineering examples to approximate runoff depth; evaluates held-out test MAE and R². Compares ML prediction with the direct equation for transparency. The ML is **a proof of concept**, not demonstrated additional value over the direct method or observed-field accuracy.
 
-## Originality and credit
+## Engineering limitations
 
-The application code is a new educational prototype built for RainCheck AI with AI-assisted programming. NRCS Curve Number is established engineering science; Random Forest and Streamlit are third-party technologies. Verify any event rules on the use of AI coding assistants, and accurately disclose methods and contributor roles.
+- Only **one storm event** is modeled. Composite CN assumptions simplify hydraulically separate surfaces and soil variability.
+- No infiltration testing, routing, peak flows, flooding probability, inlets, storage, rain-garden sizing, water quality, time of concentration or detailed site planning.
+- Unit-cost assumption is invented for demonstration and should not be used to estimate real projects.
+- Replacing pavement with good-condition pervious open space is a design exploration, not a claim about BMP removal efficiency.
+- For actual design, compare to local stormwater rules, field observations and detailed hydrologic/hydraulic software such as EPA SWMM.
+
+## Judges' demonstration
+
+Set rainfall 3 in, site 5 acres, impervious 65%, soil B and budget $50,000. Show baseline runoff. Lower impervious coverage to 45% and show change. Return to 65%; increase budget and site conversion ceiling to show choices being screened. Open the AI validation section; distinguish surrogate modeling from exact equation and field measurements. Finish with needed real-world data.
+
+
+## v0.3 theme
+Pink & berry UI update, new banner and explanatory visual, high contrast labels and chart accents. Engineering, model, and recommendation logic is unchanged from v0.2.
